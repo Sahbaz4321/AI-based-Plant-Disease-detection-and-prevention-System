@@ -1,81 +1,140 @@
-import React from "react";
-import { Link } from "react-router-dom";
-
-const feedback = {
-  detectedDisease: "Leaf Blight",
-  cureProcedure:
-    "Spray Mancozeb 2.5g per litre of water at 10-day intervals. Remove and burn infected leaves.",
-  fertilizer: "NPK 19:19:19 foliar spray — promotes leaf recovery.",
-  preventiveMeasures:
-    "Maintain field hygiene, avoid overhead irrigation, and rotate crops annually.",
-};
-
-const cards = [
-  { title: "Detected disease", value: feedback.detectedDisease, icon: "bi-bug" },
-  { title: "Procedure to cure", value: feedback.cureProcedure, icon: "bi-clipboard2-pulse", full: true },
-  { title: "Recommended fertilizer", value: feedback.fertilizer, icon: "bi-flower2" },
-  { title: "Preventive measures", value: feedback.preventiveMeasures, icon: "bi-shield-check", full: true },
-];
+import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { database } from "../firebase";
+import { ref, push, set } from "firebase/database";
 
 export default function Feedback() {
+  const { user } = useAuth();
+  const { showToast } = useToast();
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (rating === 0) {
+      showToast("Please provide a rating.", "error");
+      return;
+    }
+    setLoading(true);
+    
+    try {
+      const feedbackEntry = {
+        rating,
+        comment,
+        date: new Date().toISOString()
+      };
+
+      if (user) {
+        const feedbackRef = ref(database, `users/${user.id}/feedbacks`);
+        const newFeedbackRef = push(feedbackRef);
+        await set(newFeedbackRef, feedbackEntry);
+        showToast("Feedback submitted successfully. Thank you!", "success");
+      } else {
+        showToast("Please log in to submit feedback.", "error");
+      }
+      
+      setRating(0);
+      setComment("");
+    } catch (err) {
+      showToast("Failed to submit feedback. Try again.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="container">
+    <div className="container py-5">
       <section className="stagger text-center mb-5">
         <h1 className="h3 fw-bold mb-2" style={{ color: "var(--text-primary)" }}>
-          <i className="bi bi-chat-square-text me-2 text-accent" />
-          AgroScan feedback
+          <i className="bi bi-chat-heart me-2 text-accent" />
+          We Value Your Feedback
         </h1>
         <p style={{ color: "var(--text-muted)", maxWidth: "520px", margin: "0 auto" }}>
-          Latest analysis: disease, cure, fertilizer, and prevention tips.
+          Let us know how AgroScan is helping your farm, or suggest features you'd love to see next!
         </p>
       </section>
 
-      <div className="stagger" style={{ maxWidth: "680px", margin: "0 auto" }}>
-        <div className="glass rounded-4 p-4 p-md-5 mb-4">
-          <h2 className="h5 fw-bold mb-4" style={{ color: "var(--text-primary)" }}>
-            <i className="bi bi-clipboard2-data me-2 text-accent" />
-            Analysis result
-          </h2>
-          <div className="row g-3">
-            {cards.map((c, i) => (
-              <div key={i} className={c.full ? "col-12" : "col-md-6"}>
-                <div
-                  className="rounded-3 p-4 h-100 d-flex align-items-start gap-3"
-                  style={{ background: "var(--accent-muted)", border: "1px solid var(--border)" }}
-                >
-                  <div
-                    className="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                    style={{ width: 44, height: 44, background: "var(--bg-secondary)", color: "var(--accent)" }}
+      <div className="stagger mx-auto" style={{ maxWidth: "600px" }}>
+        <div className="glass-lg rounded-4 p-4 p-md-5 mb-4 position-relative overflow-hidden">
+          {/* Decorative element */}
+          <div className="position-absolute top-0 start-0 w-100" style={{ height: "4px", background: "linear-gradient(90deg, var(--gradient-start), var(--gradient-end))" }} />
+          
+          <form onSubmit={handleSubmit}>
+            {/* Rating Stars */}
+            <div className="mb-4 text-center">
+              <label className="form-label fw-semibold d-block mb-3" style={{ color: "var(--text-secondary)", fontSize: "1.1rem" }}>
+                Rate your experience
+              </label>
+              <div className="d-flex justify-content-center gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className="btn btn-link p-0 border-0 text-decoration-none transition-transform"
+                    style={{ 
+                      color: (hoverRating || rating) >= star ? "#fbbf24" : "var(--border)",
+                      fontSize: "2.5rem",
+                      transform: (hoverRating || rating) >= star ? "scale(1.1)" : "scale(1)"
+                    }}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    onClick={() => setRating(star)}
                   >
-                    <i className={`bi ${c.icon}`} style={{ fontSize: "1.1rem" }} />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="small text-muted mb-1">{c.title}</div>
-                    <div className="fw-semibold" style={{ color: "var(--text-primary)" }}>
-                      {c.value}
-                    </div>
-                  </div>
-                </div>
+                    <i className={`bi ${(hoverRating || rating) >= star ? "bi-star-fill" : "bi-star"}`} />
+                  </button>
+                ))}
               </div>
-            ))}
-          </div>
-          <div
-            className="alert alert-success rounded-3 mt-4 mb-0 d-flex align-items-center gap-2"
-            style={{ background: "var(--accent-muted)", border: "1px solid var(--border)" }}
-          >
-            <i className="bi bi-check-circle flex-shrink-0" />
-            Your field report has been generated successfully.
-          </div>
-        </div>
+            </div>
 
-        <div className="text-center">
-          <p className="mb-3" style={{ color: "var(--text-muted)" }}>
-            Upload a crop image on the <strong>Scan</strong> page to get new AI-based feedback.
+            {/* Comment Area */}
+            <div className="mb-4">
+              <label className="form-label small fw-semibold" style={{ color: "var(--text-secondary)" }}>
+                Your Review / Suggestions
+              </label>
+              <textarea
+                className="form-control p-3 rounded-3"
+                rows="5"
+                placeholder="Tell us what you love or what could be improved..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                required
+                style={{ resize: "none", background: "var(--bg-secondary)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
+              />
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              className="btn btn-agro w-100 py-3 rounded-3 fw-bold fs-6 d-flex align-items-center justify-content-center gap-2"
+              disabled={loading}
+              style={{ transition: "transform 0.2s" }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm" role="status" />
+                  Submitting…
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-send-fill" />
+                  Submit Feedback
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+        
+        {/* Helper Note */}
+        <div className="text-center small">
+          <p style={{ color: "var(--text-muted)" }}>
+            <i className="bi bi-shield-check me-1 text-accent" />
+            Your feedback will be securely saved into your profile dashboard.
           </p>
-          <Link to="/upload" className="btn btn-agro">
-            <i className="bi bi-camera me-2" />
-            Scan image
-          </Link>
         </div>
       </div>
     </div>

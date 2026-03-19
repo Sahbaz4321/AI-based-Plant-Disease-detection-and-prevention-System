@@ -44,5 +44,32 @@ app.post("/api/upload", upload.single("image"), (req, res) => {
   res.json(diseaseData[random]);
 });
 
-const PORT = 5000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+// app.post('/api/upload', upload.array('images', 10), async (req, res) => {
+//   const files = req.files;
+
+//   if (!files || files.length === 0) {
+//     return res.status(400).json({ error: 'No images uploaded' });
+//   }
+
+//   const formData = new FormData();
+
+//   files.forEach(file => {
+//     formData.append('images', fs.createReadStream(file.path)); // ✅ same name
+//   });
+
+//   try {
+//     const response = await axios.post('http://localhost:5001/predict', formData, {
+//       headers: formData.getHeaders(),
+//     });
+
+//     res.json(response.data);
+//   } catch (err) {
+//     console.error('Error:', err.message);
+//     res.status(500).json({ error: 'API error' });
+//   } finally {
+//     files.forEach(file => fs.unlink(file.path, () => {}));
+//   }
+// });
+
+// const PORT = 5000;
+// app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

@@ -84,6 +84,12 @@ code {
 .bg-accent { background: var(--accent); }
 .bg-accent-muted { background: var(--accent-muted); }
 
+/* Override Bootstrap text utility colors for Dark Mode contrast */
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.text-dark { color: var(--text-primary) !important; }
+
 /* ===== Animations ===== */
 @keyframes fadeInUp {
   from {
