@@ -180,7 +180,7 @@ export default function Upload() {
     try {
       // 1) Get predictions for all images
       const predictRes = await ModelAPI.post("/predict", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        // headers: { "Content-Type": "multipart/form-data" },
       });
 
       const predictionsData = Array.isArray(predictRes.data) ? predictRes.data : [predictRes.data];
@@ -256,11 +256,28 @@ export default function Upload() {
       }
       
       showToast(`${files.length} images scanned successfully!`, "info");
-    } catch (err) {
-      clearInterval(interval);
-      setProgress(0);
-      showToast("Scan failed. Please try again.", "error");
-    } finally {
+    } 
+    
+    // catch (err) {
+    //   clearInterval(interval);
+    //   setProgress(0);
+    //   showToast("Scan failed. Please try again.", "error");
+    // }
+    catch (err) {
+  clearInterval(interval);
+  setProgress(0);
+
+  console.error("Full error:", err);
+  console.error("Response data:", err?.response?.data);
+  console.error("Response status:", err?.response?.status);
+  console.error("Request URL:", err?.config?.baseURL + err?.config?.url);
+
+  showToast(
+    err?.response?.data?.error || err.message || "Scan failed. Please try again.",
+    "error"
+  );
+}
+     finally {
       setLoading(false);
     }
   };
