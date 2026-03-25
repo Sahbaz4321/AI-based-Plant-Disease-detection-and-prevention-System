@@ -330,9 +330,6 @@
 # if __name__ == "__main__":
 #     port = int(os.environ.get("PORT", 10000))
 #     app.run(host="0.0.0.0", port=port)
-
-
-
 from flask import Flask, request, jsonify
 from tensorflow.keras.applications.efficientnet import preprocess_input
 import tensorflow as tf
@@ -354,6 +351,7 @@ IMG_SIZE = 224
 
 model = None
 classes = {}
+
 startup_status = {
     "cwd": "",
     "files_in_cwd": [],
@@ -366,10 +364,15 @@ startup_status = {
     "classes_count": 0,
     "model_load_error": None,
     "classes_load_error": None,
+    "gemini_key_found": False,
+    "gemini_key_length": 0,
+    "gemini_key_prefix": None,
 }
+
 
 def log_startup_status():
     print("\n========== STARTUP DEBUG ==========")
+
     startup_status["cwd"] = os.getcwd()
     print("Current Working Directory:", startup_status["cwd"])
 
@@ -387,10 +390,27 @@ def log_startup_status():
 
     print(f"Classes path: {CLASSES_PATH}")
     print(f"Classes file found: {startup_status['classes_file_found']}")
+
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+    if gemini_key:
+        startup_status["gemini_key_found"] = True
+        startup_status["gemini_key_length"] = len(gemini_key)
+        startup_status["gemini_key_prefix"] = gemini_key[:5]
+        print("GEMINI_API_KEY FOUND ✅")
+        print("GEMINI_API_KEY length:", len(gemini_key))
+        print("GEMINI_API_KEY prefix:", gemini_key[:5])
+    else:
+        startup_status["gemini_key_found"] = False
+        startup_status["gemini_key_length"] = 0
+        startup_status["gemini_key_prefix"] = None
+        print("GEMINI_API_KEY NOT FOUND ❌")
+
     print("===================================\n")
+
 
 def load_classes_once():
     global classes
+
     if not classes:
         try:
             print("Loading classes.json...")
@@ -399,6 +419,8 @@ def load_classes_once():
 
             startup_status["classes_loaded"] = True
             startup_status["classes_count"] = len(classes)
+            startup_status["classes_load_error"] = None
+
             print(f"classes.json loaded successfully. Total classes: {len(classes)}")
         except Exception as e:
             startup_status["classes_loaded"] = False
@@ -406,22 +428,27 @@ def load_classes_once():
             print("Failed to load classes.json:", str(e))
             raise
 
+
 def load_model_once():
     global model
+
     if model is None:
         try:
             print("Loading model now...")
             model = tf.keras.models.load_model(MODEL_PATH, compile=False)
             startup_status["model_loaded"] = True
-            print("Model loaded successfully")
+            startup_status["model_load_error"] = None
+
+            print("Model loaded successfully ✅")
             print("Model type:", type(model))
             print("Model input shape:", getattr(model, "input_shape", "Not available"))
             print("Model output shape:", getattr(model, "output_shape", "Not available"))
         except Exception as e:
             startup_status["model_loaded"] = False
             startup_status["model_load_error"] = str(e)
-            print("Failed to load model:", str(e))
+            print("Failed to load model ❌:", str(e))
             raise
+
 
 def preprocess_image(image_bytes):
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
@@ -431,21 +458,22 @@ def preprocess_image(image_bytes):
     img_array = preprocess_input(img_array)
     return img_array
 
+
 # Startup diagnostics
 log_startup_status()
 
-# Try loading classes at startup so issue wahi dikhe
+# Load classes at startup
 try:
     load_classes_once()
 except Exception:
     traceback.print_exc()
 
-# Optional: model startup pe load mat karo, lazy hi rakho
-# Agar startup pe hi test karna hai to neeche uncomment kar de:
+# Load model at startup for debugging
 try:
     load_model_once()
 except Exception:
     traceback.print_exc()
+
 
 @app.route("/")
 def home():
@@ -463,24 +491,35 @@ def home():
             "classes_loaded": startup_status["classes_loaded"],
             "classes_count": startup_status["classes_count"],
             "classes_load_error": startup_status["classes_load_error"],
+            "gemini_key_found": startup_status["gemini_key_found"],
+            "gemini_key_length": startup_status["gemini_key_length"],
+            "gemini_key_prefix": startup_status["gemini_key_prefix"],
         }
     })
 
+
 @app.route("/health")
 def health():
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+
     return jsonify({
         "status": "ok",
         "model_found": os.path.exists(MODEL_PATH),
         "classes_found": os.path.exists(CLASSES_PATH),
         "model_loaded": model is not None,
         "classes_loaded": bool(classes),
-        "classes_count": len(classes) if isinstance(classes, dict) else 0
+        "classes_count": len(classes) if isinstance(classes, dict) else 0,
+        "gemini_key_found": bool(gemini_key),
+        "gemini_key_length": len(gemini_key) if gemini_key else 0,
+        "gemini_key_prefix": gemini_key[:5] if gemini_key else None,
     })
+
 
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
         print("\n========== /predict called ==========")
+
         load_classes_once()
         load_model_once()
 
@@ -508,9 +547,9 @@ def predict():
             predicted_class = classes.get(str(top_idx), f"class_{top_idx}")
             confidence = float(predictions[top_idx])
 
-            print(f"Top index: {top_idx}")
-            print(f"Predicted class: {predicted_class}")
-            print(f"Confidence: {confidence}")
+            print("Top index:", top_idx)
+            print("Predicted class:", predicted_class)
+            print("Confidence:", confidence)
 
             results.append({
                 "filename": file.filename,
@@ -536,6 +575,7 @@ def predict():
             }
         }), 500
 
+
 @app.route("/explain-disease", methods=["POST"])
 def explain_disease():
     data = request.get_json(silent=True) or {}
@@ -546,8 +586,25 @@ def explain_disease():
 
     api_key = os.environ.get("GEMINI_API_KEY")
 
+    print("\n========== GEMINI KEY DEBUG ==========")
+    if api_key:
+        print("GEMINI_API_KEY FOUND ✅")
+        print("Key length:", len(api_key))
+        print("First 5 chars:", api_key[:5])
+    else:
+        print("GEMINI_API_KEY NOT FOUND ❌")
+    print("=====================================\n")
+
     if not api_key:
-        return jsonify({"error": "GEMINI_API_KEY not configured on server"}), 500
+        return jsonify({
+            "error": "GEMINI_API_KEY not configured on server",
+            "debug": {
+                "gemini_key_found": False,
+                "gemini_key_length": 0,
+                "gemini_key_prefix": None,
+                "available_env_keys": list(os.environ.keys())
+            }
+        }), 500
 
     try:
         print("\n========== /explain-disease called ==========")
@@ -596,8 +653,14 @@ Do not include any additional text outside the JSON.
         traceback.print_exc()
         return jsonify({
             "error": "Gemini failed",
-            "details": str(e)
+            "details": str(e),
+            "debug": {
+                "gemini_key_found": True,
+                "gemini_key_length": len(api_key),
+                "gemini_key_prefix": api_key[:5]
+            }
         }), 500
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
