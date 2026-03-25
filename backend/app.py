@@ -333,6 +333,12 @@
 
 
 
+
+
+
+
+
+
 from flask import Flask, request, jsonify
 from tensorflow.keras.applications.efficientnet import preprocess_input
 import tensorflow as tf
@@ -348,20 +354,20 @@ import google.generativeai as genai
 app = Flask(__name__)
 CORS(app)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "final_model.keras")
-CLASSES_PATH = os.path.join(BASE_DIR, "classes.json")
+# -------------------------
+# Load model & classes
+# -------------------------
+MODEL_PATH = "final_model.keras"
+model = tf.keras.models.load_model(MODEL_PATH, compile=False)
 
-print("MODEL PATH:", MODEL_PATH)
-print("CLASSES PATH:", CLASSES_PATH)
-
-model = tf.keras.models.load_model(MODEL_PATH)
-
-with open(CLASSES_PATH, "r") as f:
+with open("classes.json", "r") as f:
     classes = json.load(f)
 
 IMG_SIZE = 224
 
+# -------------------------
+# Preprocess
+# -------------------------
 def preprocess_image(image_bytes):
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     img = img.resize((IMG_SIZE, IMG_SIZE))
@@ -370,6 +376,9 @@ def preprocess_image(image_bytes):
     img_array = preprocess_input(img_array)
     return img_array
 
+# -------------------------
+# Predict API
+# -------------------------
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
@@ -383,6 +392,8 @@ def predict():
         for file in files:
             img_array = preprocess_image(file.read())
             predictions = model.predict(img_array)[0]
+
+            print("DEBUG predictions:", predictions)
 
             top_idx = int(np.argmax(predictions))
             predicted_class = classes.get(str(top_idx), f"class_{top_idx}")
@@ -403,6 +414,9 @@ def predict():
             "details": str(e)
         }), 500
 
+# -------------------------
+# Gemini Explain API
+# -------------------------
 @app.route("/explain-disease", methods=["POST"])
 def explain_disease():
     data = request.get_json(silent=True) or {}
@@ -412,7 +426,6 @@ def explain_disease():
         return jsonify({"error": "Missing 'disease' in body"}), 400
 
     api_key = os.environ.get("GEMINI_API_KEY")
-
     if not api_key:
         return jsonify({"error": "GEMINI_API_KEY not configured on server"}), 500
 
@@ -435,11 +448,10 @@ Do not include any additional text outside the JSON.
 """
 
         response = model_g.generate_content(prompt)
-        text = response.text.strip()
+        text = response.text.strip() if hasattr(response, "text") else str(response)
 
         start = text.find("{")
         end = text.rfind("}")
-
         if start != -1 and end != -1:
             text = text[start:end+1]
 
@@ -459,10 +471,16 @@ Do not include any additional text outside the JSON.
             "details": str(e)
         }), 500
 
+# -------------------------
+# Health Check Route
+# -------------------------
 @app.route("/")
 def home():
     return "AI Plant Disease API Running 🚀"
 
+# -------------------------
+# Render Port
+# -------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
