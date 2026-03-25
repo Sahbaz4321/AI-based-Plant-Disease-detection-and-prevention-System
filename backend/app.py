@@ -335,8 +335,6 @@
 
 
 
-
-
 from flask import Flask, request, jsonify
 from tensorflow.keras.applications.efficientnet import preprocess_input
 import tensorflow as tf
@@ -347,7 +345,7 @@ import json
 from flask_cors import CORS
 import os
 import traceback
-import google.generativeai as genai
+from google import genai
 
 app = Flask(__name__)
 CORS(app)
@@ -466,6 +464,7 @@ def preprocess_image(image_bytes):
     return img_array
 
 
+# Startup diagnostics
 log_startup_status()
 
 try:
@@ -605,8 +604,7 @@ def explain_disease():
             "debug": {
                 "gemini_key_found": False,
                 "gemini_key_length": 0,
-                "gemini_key_prefix": None,
-                "available_env_keys": list(os.environ.keys())
+                "gemini_key_prefix": None
             }
         }), 500
 
@@ -614,8 +612,7 @@ def explain_disease():
         print("\n========== /explain-disease called ==========")
         print("Disease:", disease)
 
-        genai.configure(api_key=api_key)
-        model_g = genai.GenerativeModel("gemini-2.5-flash")
+        client = genai.Client(api_key=api_key)
 
         prompt = f"""
 You are an expert agronomist. Briefly explain how to handle the following plant disease for a farmer.
@@ -631,9 +628,12 @@ Return ONLY valid JSON with this shape:
 Do not include any additional text outside the JSON.
 """
 
-        response = model_g.generate_content(prompt)
-        text = response.text.strip() if hasattr(response, "text") else str(response)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
 
+        text = response.text.strip() if hasattr(response, "text") else str(response)
         print("Raw Gemini response:", text)
 
         start = text.find("{")
@@ -670,8 +670,6 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     print(f"Starting Flask app on port {port}...")
     app.run(host="0.0.0.0", port=port)
-
-
 
 
 
