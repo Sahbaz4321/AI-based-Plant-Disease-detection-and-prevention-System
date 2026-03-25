@@ -337,8 +337,6 @@
 
 
 
-
-
 from flask import Flask, request, jsonify
 from tensorflow.keras.applications.efficientnet import preprocess_input
 import tensorflow as tf
@@ -354,20 +352,21 @@ import google.generativeai as genai
 app = Flask(__name__)
 CORS(app)
 
-# -------------------------
-# Load model & classes
-# -------------------------
 MODEL_PATH = "final_model.keras"
-model = tf.keras.models.load_model(MODEL_PATH, compile=False)
+model = None
 
 with open("classes.json", "r") as f:
     classes = json.load(f)
 
 IMG_SIZE = 224
 
-# -------------------------
-# Preprocess
-# -------------------------
+def load_model_once():
+    global model
+    if model is None:
+        print("Loading model now...")
+        model = tf.keras.models.load_model(MODEL_PATH, compile=False)
+        print("Model loaded successfully")
+
 def preprocess_image(image_bytes):
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     img = img.resize((IMG_SIZE, IMG_SIZE))
@@ -376,14 +375,16 @@ def preprocess_image(image_bytes):
     img_array = preprocess_input(img_array)
     return img_array
 
-# -------------------------
-# Predict API
-# -------------------------
+@app.route("/")
+def home():
+    return "AI Plant Disease API Running 🚀"
+
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        files = request.files.getlist("images")
+        load_model_once()
 
+        files = request.files.getlist("images")
         if len(files) == 0:
             return jsonify({"error": "No images uploaded"}), 400
 
@@ -392,8 +393,6 @@ def predict():
         for file in files:
             img_array = preprocess_image(file.read())
             predictions = model.predict(img_array)[0]
-
-            print("DEBUG predictions:", predictions)
 
             top_idx = int(np.argmax(predictions))
             predicted_class = classes.get(str(top_idx), f"class_{top_idx}")
@@ -414,9 +413,6 @@ def predict():
             "details": str(e)
         }), 500
 
-# -------------------------
-# Gemini Explain API
-# -------------------------
 @app.route("/explain-disease", methods=["POST"])
 def explain_disease():
     data = request.get_json(silent=True) or {}
@@ -471,16 +467,6 @@ Do not include any additional text outside the JSON.
             "details": str(e)
         }), 500
 
-# -------------------------
-# Health Check Route
-# -------------------------
-@app.route("/")
-def home():
-    return "AI Plant Disease API Running 🚀"
-
-# -------------------------
-# Render Port
-# -------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
