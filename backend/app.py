@@ -330,6 +330,13 @@
 # if __name__ == "__main__":
 #     port = int(os.environ.get("PORT", 10000))
 #     app.run(host="0.0.0.0", port=port)
+
+
+
+
+
+
+
 from flask import Flask, request, jsonify
 from tensorflow.keras.applications.efficientnet import preprocess_input
 import tensorflow as tf
@@ -459,16 +466,13 @@ def preprocess_image(image_bytes):
     return img_array
 
 
-# Startup diagnostics
 log_startup_status()
 
-# Load classes at startup
 try:
     load_classes_once()
 except Exception:
     traceback.print_exc()
 
-# Load model at startup for debugging
 try:
     load_model_once()
 except Exception:
