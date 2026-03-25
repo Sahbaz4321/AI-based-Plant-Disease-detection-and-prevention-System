@@ -334,7 +334,6 @@
 
 
 
-
 from flask import Flask, request, jsonify
 from tensorflow.keras.applications.efficientnet import preprocess_input
 import tensorflow as tf
@@ -349,7 +348,8 @@ from google import genai
 
 app = Flask(__name__)
 CORS(app)
-MODEL_PATH = "final_model_fixed.keras"   # ✅ IMPORTANT CHANGE
+
+MODEL_PATH = "final_model_fixed.h5"
 CLASSES_PATH = "classes.json"
 IMG_SIZE = 224
 
@@ -542,7 +542,7 @@ def predict():
             img_array = preprocess_image(image_bytes)
             print("Preprocessing done. Shape:", img_array.shape)
 
-            predictions = model.predict(img_array)[0]
+            predictions = model.predict(img_array, verbose=0)[0]
             print("Prediction completed.")
 
             top_idx = int(np.argmax(predictions))
@@ -632,7 +632,7 @@ Do not include any additional text outside the JSON.
             contents=prompt
         )
 
-        text = response.text.strip() if hasattr(response, "text") else str(response)
+        text = response.text.strip() if hasattr(response, "text") and response.text else str(response)
         print("Raw Gemini response:", text)
 
         start = text.find("{")
@@ -669,7 +669,6 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     print(f"Starting Flask app on port {port}...")
     app.run(host="0.0.0.0", port=port)
-
 
 
 # from flask import Flask, request, jsonify
