@@ -4,4 +4,4 @@ tensorflow==2.13.0
 numpy
 pillow==10.0.1
 google-generativeai
-gunicorn
+gunicorn backend.app:app
