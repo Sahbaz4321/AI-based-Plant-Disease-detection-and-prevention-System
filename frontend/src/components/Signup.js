@@ -74,7 +74,7 @@ export default function Signup() {
                   type="text"
                   name="name"
                   className="form-control ps-5"
-                  placeholder="Rahul Sharma"
+                  placeholder="Sahbaz Siddique"
                   value={form.name}
                   onChange={handleChange}
                   required

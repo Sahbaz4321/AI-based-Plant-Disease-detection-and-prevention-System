@@ -3,46 +3,7 @@ import { Link } from "react-router-dom";
 import { auth, database } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { ref, get, child } from "firebase/database";
-
-// Fallback logic for generating smart soil advice based on crop and disease.
-const generateYieldAdvice = (disease) => {
-  const d = disease ? disease.toLowerCase() : "";
-  
-  if (d.includes("blight") || d.includes("rot") || d.includes("mold")) {
-    return {
-      type: "Well-drained Loam Soil",
-      fertility: "Risk of Pathogen Build-up",
-      fertilizer: "High Phosphorus & Potassium Mix (e.g. 5-10-10)",
-      action: "Avoid over-watering. Rotate crops immediately and increase soil drainage. Apply fungicides strictly.",
-      healthScore: 45
-    };
-  } else if (d.includes("healthy")) {
-    return {
-      type: "Rich Organic Loam",
-      fertility: "Highly Fertile",
-      fertilizer: "Balanced NPK (e.g. 10-10-10) or Organic Compost",
-      action: "Maintain current irrigation and fertilizing schedules. Excellent crop and soil condition.",
-      healthScore: 90
-    };
-  } else if (d.includes("rust") || d.includes("spot")) {
-    return {
-      type: "Sandy Loam",
-      fertility: "Moderate - Nitrogen Deficiency likely",
-      fertilizer: "Nitrogen-Rich Fertilizer (e.g. 20-5-5)",
-      action: "Increase spacing for airflow. Provide rich compost and ensure leaves stay dry during watering.",
-      healthScore: 65
-    };
-  }
-  
-  // Default generic
-  return {
-    type: "Standard Loam / Clay Loam",
-    fertility: "Unknown / Variable",
-    fertilizer: "Balanced All-Purpose Crop Fertilizer",
-    action: "Run an AI scan on your crops to receive customized soil yield improvements and fertilizer types.",
-    healthScore: 50
-  };
-};
+import { generateYieldAdvice } from "../utils/soilAdvice";
 
 export default function SoilInfo() {
   const [loading, setLoading] = useState(true);
@@ -139,17 +100,25 @@ export default function SoilInfo() {
             </div>
             
             <div className="text-center position-relative">
-              {/* Circular pseudo-progress */}
-              <div
-                className="rounded-circle d-flex flex-column align-items-center justify-content-center shadow-sm"
-                style={{
-                  width: 120, height: 120,
-                  background: advice.healthScore > 75 ? "rgba(34, 197, 94, 0.15)" : advice.healthScore > 50 ? "rgba(245, 158, 11, 0.15)" : "rgba(239, 68, 68, 0.15)",
-                  border: `4px solid ${advice.healthScore > 75 ? "#22c55e" : advice.healthScore > 50 ? "#f59e0b" : "#ef4444"}`
-                }}
-              >
-                <span className="fs-2 fw-bold" style={{ color: "var(--text-primary)" }}>{advice.healthScore}</span>
-                <span className="small text-muted fw-semibold uppercase" style={{ fontSize: "0.75rem" }}>/ 100</span>
+              <div className="position-relative d-flex align-items-center justify-content-center" style={{ width: 140, height: 140 }}>
+                <svg width="140" height="140" viewBox="0 0 140 140" className="position-absolute z-0">
+                  <circle cx="70" cy="70" r="60" fill="none" stroke="var(--border)" strokeWidth="8" />
+                  <circle cx="70" cy="70" r="60" fill="none" stroke={advice.healthScore > 75 ? "#10b981" : advice.healthScore > 50 ? "#f59e0b" : "#ef4444"} strokeWidth="8"
+                    strokeDasharray="377" 
+                    strokeDashoffset={377 - (377 * (advice.healthScore || 0)) / 100}
+                    strokeLinecap="round"
+                    style={{ 
+                      transition: "stroke-dashoffset 1.5s ease-out", 
+                      transform: "rotate(-90deg)", 
+                      transformOrigin: "50% 50%", 
+                      filter: `drop-shadow(0 0 8px ${advice.healthScore > 75 ? "rgba(16,185,129,0.5)" : advice.healthScore > 50 ? "rgba(245,158,11,0.5)" : "rgba(239,68,68,0.5)"})` 
+                    }}
+                  />
+                </svg>
+                <div className="position-relative z-1 d-flex flex-column align-items-center justify-content-center">
+                  <span className="fs-2 fw-bold" style={{ color: "var(--text-primary)" }}>{advice.healthScore}</span>
+                  <span className="small text-muted fw-semibold text-uppercase" style={{ fontSize: "0.75rem" }}>/ 100</span>
+                </div>
               </div>
             </div>
           </div>
@@ -157,11 +126,7 @@ export default function SoilInfo() {
           {/* Information Grid */}
           <div className="row g-4 mb-4">
             <div className="col-md-6">
-              <div className="glass rounded-4 p-4 h-100 position-relative overflow-hidden"
-                style={{ transition: "transform 0.2s" }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-4px)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
-              >
+              <div className="glass rounded-4 p-4 h-100 position-relative overflow-hidden">
                 <div className="d-flex align-items-center gap-3 mb-3">
                   <div className="rounded-circle d-flex align-items-center justify-content-center shadow-sm" style={{ width: 48, height: 48, background: "var(--bg-secondary)", color: "var(--accent)" }}>
                     <i className="bi bi-globe-americas fs-5" />
@@ -177,11 +142,7 @@ export default function SoilInfo() {
             </div>
             
             <div className="col-md-6">
-              <div className="glass rounded-4 p-4 h-100 position-relative overflow-hidden"
-                style={{ transition: "transform 0.2s" }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-4px)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
-              >
+              <div className="glass rounded-4 p-4 h-100 position-relative overflow-hidden">
                 <div className="d-flex align-items-center gap-3 mb-3">
                   <div className="rounded-circle d-flex align-items-center justify-content-center shadow-sm" style={{ width: 48, height: 48, background: "var(--bg-secondary)", color: "var(--accent)" }}>
                     <i className="bi bi-graph-up-arrow fs-5" />

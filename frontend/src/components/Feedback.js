@@ -73,11 +73,13 @@ export default function Feedback() {
                   <button
                     key={star}
                     type="button"
-                    className="btn btn-link p-0 border-0 text-decoration-none transition-transform"
+                    className="btn btn-link p-0 border-0 text-decoration-none"
                     style={{ 
                       color: (hoverRating || rating) >= star ? "#fbbf24" : "var(--border)",
                       fontSize: "2.5rem",
-                      transform: (hoverRating || rating) >= star ? "scale(1.1)" : "scale(1)"
+                      transform: (hoverRating || rating) >= star ? "scale(1.1)" : "scale(1)",
+                      filter: (hoverRating || rating) >= star ? "drop-shadow(0 0 8px rgba(251,191,36,0.6))" : "none",
+                      transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
                     }}
                     onMouseEnter={() => setHoverRating(star)}
                     onMouseLeave={() => setHoverRating(0)}
@@ -101,7 +103,7 @@ export default function Feedback() {
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 required
-                style={{ resize: "none", background: "var(--bg-secondary)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
+                style={{ resize: "none" }}
               />
             </div>
 
@@ -110,9 +112,6 @@ export default function Feedback() {
               type="submit"
               className="btn btn-agro w-100 py-3 rounded-3 fw-bold fs-6 d-flex align-items-center justify-content-center gap-2"
               disabled={loading}
-              style={{ transition: "transform 0.2s" }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
             >
               {loading ? (
                 <>

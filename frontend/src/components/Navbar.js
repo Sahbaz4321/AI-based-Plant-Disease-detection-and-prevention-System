@@ -78,20 +78,6 @@ export default function Navbar() {
                 </li>
               ))}
 
-            {/* Theme toggle */}
-            <li className="nav-item ms-lg-2">
-              <button
-                type="button"
-                className="btn btn-link nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3 text-decoration-none border-0"
-                onClick={toggleTheme}
-                aria-label="Toggle theme"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                <i className={`bi ${dark ? "bi-sun" : "bi-moon-stars"}`} />
-                {dark ? "Light" : "Dark"}
-              </button>
-            </li>
-
             {/* Auth section */}
             {isAuthenticated ? (
               <li className="nav-item ms-lg-2 position-relative">
@@ -121,7 +107,7 @@ export default function Navbar() {
                   <div
                     className="position-absolute end-0 mt-2 rounded-3 shadow-lg animate-fade-in"
                     style={{
-                      background: "var(--bg-card)",
+                      background: dark ? "#111827" : "#ffffff", // Changed from var(--bg-card) which was transparent
                       border: "1px solid var(--border)",
                       minWidth: 200,
                       zIndex: 1050,
@@ -154,6 +140,17 @@ export default function Navbar() {
                         About Us
                       </Link>
                       <Link
+                        to="/reports"
+                        className="btn w-100 text-start d-flex align-items-center gap-2 px-3 py-2 rounded-2 border-0 text-decoration-none"
+                        onClick={() => setDropdownOpen(false)}
+                        style={{ background: "transparent", color: "var(--text-secondary)" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-muted)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <i className="bi bi-folder-check" />
+                        My Reports
+                      </Link>
+                      <Link
                         to="/contact"
                         className="btn w-100 text-start d-flex align-items-center gap-2 px-3 py-2 rounded-2 border-0 text-decoration-none"
                         onClick={() => setDropdownOpen(false)}
@@ -164,6 +161,18 @@ export default function Navbar() {
                         <i className="bi bi-envelope" />
                         Contact Us
                       </Link>
+                      <hr className="my-1 mx-2" style={{ borderColor: "var(--border)" }} />
+                      <button
+                        type="button"
+                        className="btn w-100 text-start d-flex align-items-center gap-2 px-3 py-2 rounded-2 border-0 text-decoration-none"
+                        onClick={toggleTheme}
+                        style={{ background: "transparent", color: "var(--text-secondary)" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-muted)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <i className={`bi ${dark ? "bi-sun" : "bi-moon-stars"}`} />
+                        {dark ? "Light Mode" : "Dark Mode"}
+                      </button>
                       <hr className="my-1 mx-2" style={{ borderColor: "var(--border)" }} />
                       <button
                         type="button"
@@ -183,6 +192,18 @@ export default function Navbar() {
             ) : (
               <>
                 <li className="nav-item ms-lg-2">
+                  <button
+                    type="button"
+                    className="btn btn-link nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3 text-decoration-none border-0"
+                    onClick={toggleTheme}
+                    aria-label="Toggle theme"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    <i className={`bi ${dark ? "bi-sun" : "bi-moon-stars"}`} />
+                    {dark ? "Light" : "Dark"}
+                  </button>
+                </li>
+                <li className="nav-item">
                   <Link
                     to="/login"
                     className="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3"

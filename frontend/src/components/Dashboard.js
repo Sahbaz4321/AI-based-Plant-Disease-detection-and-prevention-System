@@ -22,6 +22,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [recentScans, setRecentScans] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
+  const [showAllScans, setShowAllScans] = useState(false);
 
   useEffect(() => {
     API.get("/dashboard")
@@ -177,13 +178,25 @@ export default function Dashboard() {
               <i className="bi bi-clock-history text-accent" />
               Recent Scans
             </h2>
-            <span className="badge rounded-pill px-3 py-2" style={{ background: "var(--accent-muted)", color: "var(--accent)", fontSize: "0.85rem" }}>
-              Total: {recentScans.length}
-            </span>
+            {recentScans.length > 6 && (
+              <button 
+                className="btn btn-sm px-4 py-2 rounded-pill fw-semibold shadow-sm animate-fade-in" 
+                onClick={() => setShowAllScans(!showAllScans)}
+                style={{ background: "var(--bg-secondary)", color: "var(--text-secondary)", border: "1px solid var(--border)", transition: "all 0.2s" }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "var(--accent-muted)"; e.currentTarget.style.color = "var(--accent)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
+              >
+                {showAllScans ? (
+                  <><i className="bi bi-eye-slash-fill me-2" />Show Less</>
+                ) : (
+                  <><i className="bi bi-eye-fill me-2" />View All ({recentScans.length})</>
+                )}
+              </button>
+            )}
           </div>
           
           <div className="row g-4">
-            {recentScans.map((scan) => (
+            {recentScans.slice(0, showAllScans ? recentScans.length : 6).map((scan) => (
               <div key={scan.id} className="col-md-6 col-lg-4">
                 <div className="glass-lg rounded-4 p-4 h-100 d-flex flex-column" style={{ transition: "transform 0.2s, box-shadow 0.2s" }}
                   onMouseEnter={(e) => {
@@ -201,7 +214,7 @@ export default function Dashboard() {
                         <i className="bi bi-bug-fill fs-5" />
                       </div>
                       <div>
-                        <div className="fw-bold text-truncate" style={{ color: "var(--text-primary)", maxWidth: "150px" }} title={scan.disease}>
+                        <div className="fw-bold text-wrap" style={{ color: "var(--text-primary)", wordBreak: "break-word" }} title={scan.disease}>
                           {scan.disease}
                         </div>
                         <div className="small text-muted">
@@ -222,14 +235,14 @@ export default function Dashboard() {
                       {scan.fertilizer && !scan.fertilizer.includes("Confidence:") && (
                           <div className="mb-2 p-2 rounded-3" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)" }}>
                              <div className="small fw-semibold mb-1" style={{ color: "var(--text-secondary)" }}><i className="bi bi-flower2 text-accent me-1"/> Fertilizer:</div>
-                             <div className="small text-muted text-truncate" title={scan.fertilizer}>{scan.fertilizer}</div>
+                             <div className="small text-muted text-wrap" style={{ lineHeight: "1.4" }} title={scan.fertilizer}>{scan.fertilizer}</div>
                           </div>
                       )}
                       
                       {scan.prevention && (
                           <div className="p-2 rounded-3" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)" }}>
                              <div className="small fw-semibold mb-1" style={{ color: "var(--text-secondary)" }}><i className="bi bi-shield-check text-accent me-1"/> Prevention:</div>
-                             <div className="small text-muted text-truncate" title={scan.prevention}>{scan.prevention}</div>
+                             <div className="small text-muted text-wrap" style={{ lineHeight: "1.4" }} title={scan.prevention}>{scan.prevention}</div>
                           </div>
                       )}
                   </div>

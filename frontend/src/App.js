@@ -16,6 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./components/Profile";
 import AboutUs from "./components/AboutUs";
 import ContactUs from "./components/ContactUs";
+import Reports from "./components/Reports";
 import "./App.css";
 import "./index.css";
 
@@ -69,6 +70,14 @@ export default function App() {
                   element={
                     <ProtectedRoute>
                       <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/reports"
+                  element={
+                    <ProtectedRoute>
+                      <Reports />
                     </ProtectedRoute>
                   }
                 />
