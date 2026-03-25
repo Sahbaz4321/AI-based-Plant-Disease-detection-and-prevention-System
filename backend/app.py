@@ -349,8 +349,7 @@ from google import genai
 
 app = Flask(__name__)
 CORS(app)
-
-MODEL_PATH = "final_model.keras"
+MODEL_PATH = "final_model_fixed.keras"   # ✅ IMPORTANT CHANGE
 CLASSES_PATH = "classes.json"
 IMG_SIZE = 224
 
