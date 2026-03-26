@@ -121,10 +121,31 @@ def predict():
                 503,
             )
 
+    print("=== /predict called ===")
+    print("Content-Type:", request.content_type)
+    print("request.files keys:", list(request.files.keys()))
+    print("request.form keys:", list(request.form.keys()))
+
     files = request.files.getlist("images")
+    if not files:
+        single_file = request.files.get("image")
+        if single_file:
+            files = [single_file]
 
     if len(files) == 0:
-        return jsonify({"error": "No images uploaded"}), 400
+        return (
+            jsonify(
+                {
+                    "error": "No images uploaded",
+                    "debug": {
+                        "content_type": request.content_type,
+                        "file_keys": list(request.files.keys()),
+                        "form_keys": list(request.form.keys()),
+                    },
+                }
+            ),
+            400,
+        )
 
     results = []
 

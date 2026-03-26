@@ -45,8 +45,10 @@ const getBase64Thumb = async (file) => {
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         resolve(canvas.toDataURL("image/jpeg", 0.6));
       };
+      img.onerror = () => resolve(null);
       img.src = e.target.result;
     };
+    reader.onerror = () => resolve(null);
     reader.readAsDataURL(file);
   });
 };
@@ -219,7 +221,7 @@ export default function Upload() {
     try {
       // 1) Get predictions for all images
       const predictRes = await ModelAPI.post("/predict", formData, {
-        // headers: { "Content-Type": "multipart/form-data" },
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       const predictionsData = Array.isArray(predictRes.data) ? predictRes.data : [predictRes.data];
@@ -259,43 +261,45 @@ export default function Upload() {
       setProgress(100);
       setResults(fullyMappedResults);
 
-      // Save to history and firebase
-      const auth = getAuth();
-      const user = auth.currentUser;
+      try {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        const newHistoryEntries = [];
 
-      const newHistoryEntries = [];
+        for (const mapped of fullyMappedResults) {
+          const historyEntry = {
+            disease: mapped.disease,
+            confidence: mapped.confidence,
+            fertilizer: mapped.fertilizer || `Confidence: ${(mapped.confidence * 100).toFixed(1)}%`,
+            procedure: mapped.procedure,
+            prevention: mapped.prevention,
+            date: new Date().toISOString(),
+            filename: mapped.filename,
+            thumbBase64: mapped.thumbBase64 || null,
+            fileSize: mapped.fileSize || null,
+            scanSource: mapped.scanSource || "Upload"
+          };
 
-      for (const mapped of fullyMappedResults) {
-        const historyEntry = {
-          disease: mapped.disease,
-          confidence: mapped.confidence,
-          fertilizer: mapped.fertilizer || `Confidence: ${(mapped.confidence * 100).toFixed(1)}%`,
-          procedure: mapped.procedure,
-          prevention: mapped.prevention,
-          date: new Date().toISOString(),
-          filename: mapped.filename,
-          thumbBase64: mapped.thumbBase64 || null,
-          fileSize: mapped.fileSize || null,
-          scanSource: mapped.scanSource || "Upload"
-        };
+          if (user) {
+            const scansRef = ref(database, `users/${user.uid}/scans`);
+            const newScanRef = push(scansRef);
+            await set(newScanRef, historyEntry);
+          } else {
+            addToHistory(historyEntry);
+          }
 
-        if (user) {
-          const scansRef = ref(database, `users/${user.uid}/scans`);
-          const newScanRef = push(scansRef);
-          await set(newScanRef, historyEntry);
-        } else {
-          addToHistory(historyEntry);
+          newHistoryEntries.push(historyEntry);
         }
-        newHistoryEntries.push(historyEntry);
-      }
 
-      if (!user) {
-        setHistory(getHistory());
-      }
-      
-      // Save last prediction locally for SoilInfo guest fallback
-      if (newHistoryEntries.length > 0) {
-        localStorage.setItem("agroscan-last-prediction", JSON.stringify(newHistoryEntries[0]));
+        if (!user) {
+          setHistory(getHistory());
+        }
+
+        if (newHistoryEntries.length > 0) {
+          localStorage.setItem("agroscan-last-prediction", JSON.stringify(newHistoryEntries[0]));
+        }
+      } catch (historyErr) {
+        console.error("Post-scan save failed:", historyErr);
       }
       
       showToast(`${files.length} images scanned successfully!`, "info");
