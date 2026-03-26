@@ -6,11 +6,11 @@ import json
 import os
 from pathlib import Path
 
-import google.generativeai as genai
 import keras
 import numpy as np
 import tensorflow as tf
 from flask_cors import CORS
+from google import genai
 from PIL import Image
 
 app = Flask(__name__)
@@ -160,8 +160,7 @@ def explain_disease():
         return jsonify({"error": "GEMINI_API_KEY not configured on server"}), 500
 
     try:
-        genai.configure(api_key=api_key)
-        model_g = genai.GenerativeModel("gemini-2.5-flash")
+        client = genai.Client(api_key=api_key)
 
         prompt = f"""
 You are an expert agronomist. Briefly explain how to handle the following plant disease for a farmer.
@@ -177,8 +176,11 @@ Return ONLY valid JSON with this shape:
 Do not include any additional text outside the JSON.
 """
 
-        response = model_g.generate_content(prompt)
-        text = response.text.strip() if hasattr(response, "text") else str(response)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
+        text = response.text.strip() if getattr(response, "text", None) else str(response)
 
         start = text.find("{")
         end = text.rfind("}")

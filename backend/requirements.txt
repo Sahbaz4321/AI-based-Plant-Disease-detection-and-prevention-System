@@ -5,4 +5,4 @@ keras==3.13.2
 pillow==12.1.1
 gunicorn==23.0.0
 h5py==3.14.0
-google-generativeai
+google-genai==1.46.0
