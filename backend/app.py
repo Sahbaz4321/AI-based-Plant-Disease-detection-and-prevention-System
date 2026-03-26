@@ -1,10 +1,15 @@
 from flask import Flask, request, jsonify
-from tensorflow.keras.applications.efficientnet import preprocess_input
 
 import io
 import json
 import os
 from pathlib import Path
+
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "-1")
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("TF_NUM_INTRAOP_THREADS", "1")
+os.environ.setdefault("TF_NUM_INTEROP_THREADS", "1")
 
 import keras
 import numpy as np
@@ -12,9 +17,13 @@ import tensorflow as tf
 from flask_cors import CORS
 from google import genai
 from PIL import Image
+from tensorflow.keras.applications.efficientnet import preprocess_input
 
 app = Flask(__name__)
 CORS(app)
+
+tf.config.threading.set_intra_op_parallelism_threads(1)
+tf.config.threading.set_inter_op_parallelism_threads(1)
 
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_CANDIDATES = [
