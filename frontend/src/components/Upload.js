@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import API, { ModelAPI } from "../api";
+import { ModelAPI } from "../api";
 import { database } from "../firebase";
 import { ref, push, set } from "firebase/database";
 import { getAuth } from "firebase/auth";
@@ -7,9 +7,11 @@ import { useToast } from "../context/ToastContext";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { generateYieldAdvice } from "../utils/soilAdvice";
+import { buildPdfReportData, PdfReportTemplate } from "../utils/pdfReport";
 
 const HISTORY_KEY = "agroscan-scan-history";
 const MAX_HISTORY = 5;
+const WORKSPACE_KEY = "agroscan-upload-workspace";
 
 function getHistory() {
   try {
@@ -84,6 +86,28 @@ export default function Upload() {
   const [dbScans, setDbScans] = useState([]);
   const [showAllHistory, setShowAllHistory] = useState(false);
 
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(WORKSPACE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (Array.isArray(saved.results)) {
+        setResults(saved.results);
+        setPreviews(saved.results.map((item) => item.thumbBase64 || item.preview).filter(Boolean));
+        setFiles(
+          saved.results.map((item) => ({
+            name: item.filename || "Scanned image",
+            size: item.fileSize || 0,
+            type: "image/*",
+          }))
+        );
+      }
+      if (typeof saved.progress === "number") setProgress(saved.progress);
+    } catch {
+      sessionStorage.removeItem(WORKSPACE_KEY);
+    }
+  }, []);
+
   // Fetch db scans for logged in user
   useEffect(() => {
     const auth = getAuth();
@@ -112,6 +136,7 @@ export default function Upload() {
     setPreviews([]);
     setFiles([]);
     setResults([]);
+    sessionStorage.removeItem(WORKSPACE_KEY);
   }, [previews]);
 
   useEffect(() => {
@@ -119,6 +144,20 @@ export default function Upload() {
       previews.forEach(p => URL.revokeObjectURL(p));
     };
   }, [previews]);
+
+  useEffect(() => {
+    const payload = {
+      results,
+      progress,
+    };
+
+    if (payload.results.length === 0) {
+      sessionStorage.removeItem(WORKSPACE_KEY);
+      return;
+    }
+
+    sessionStorage.setItem(WORKSPACE_KEY, JSON.stringify(payload));
+  }, [files, previews, results, progress]);
 
   const handleFiles = useCallback(
     (fileList) => {
@@ -209,7 +248,9 @@ export default function Upload() {
             procedure: explainData?.procedure || "",
             prevention: explainData?.prevention || "",
             preview: previews[index],
-            thumbBase64: await getBase64Thumb(files[index])
+            thumbBase64: await getBase64Thumb(files[index]),
+            fileSize: files[index]?.size || null,
+            scanSource: "Upload"
           };
         })
       );
@@ -233,7 +274,9 @@ export default function Upload() {
           prevention: mapped.prevention,
           date: new Date().toISOString(),
           filename: mapped.filename,
-          thumbBase64: mapped.thumbBase64 || null
+          thumbBase64: mapped.thumbBase64 || null,
+          fileSize: mapped.fileSize || null,
+          scanSource: mapped.scanSource || "Upload"
         };
 
         if (user) {
@@ -299,9 +342,22 @@ export default function Upload() {
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgProps = pdf.getImageProperties(imgData);
       const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+      let heightLeft = pdfHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - pdfHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+      }
+
       pdf.save(`AgroScan_${reportName}.pdf`);
       showToast("Report downloaded successfully!", "success");
     } catch (err) {
@@ -312,7 +368,12 @@ export default function Upload() {
     }
   };
 
-  const isAuth = getAuth().currentUser;
+  const currentUser = getAuth().currentUser;
+  const isAuth = currentUser;
+  const userName =
+    currentUser?.displayName ||
+    currentUser?.email?.split("@")[0] ||
+    "Sahbaz";
   const hList = isAuth ? dbScans : history;
 
   return (
@@ -597,84 +658,16 @@ export default function Upload() {
                       </div>
 
                       {/* Hidden PDF Template for html2canvas */}
-                      <div id={`pdf-template-upload-${i}`} style={{ display: 'none', width: '700px', padding: '15px 25px', backgroundColor: '#ffffff', color: '#000000', fontFamily: 'sans-serif', boxSizing: 'border-box' }}>
-                        <div style={{ textAlign: 'center', marginBottom: '10px', borderBottom: '2px solid #059669', paddingBottom: '5px' }}>
-                          <h1 style={{ color: '#059669', marginBottom: '4px', fontSize: '24px', fontWeight: 'bold' }}>AgroScan Diagnostic Report</h1>
-                          <h2 style={{ fontSize: '16px', margin: 0, color: '#1f2937' }}>{res.filename || `Scan Report ${i+1}`}</h2>
-                          <p style={{ color: '#6b7280', marginTop: '2px', fontSize: '11px' }}>Generated on {new Date().toLocaleString()}</p>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '15px', marginBottom: '10px' }}>
-                          <div style={{ flex: 1 }}>
-                             <h3 style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', color: '#111827', fontSize: '16px', margin: '0 0 6px 0' }}>Crop Analysis</h3>
-                             <p style={{ fontSize: '14px', margin: '0 0 4px 0' }}><strong>Detected Condition:</strong> {res.disease}</p>
-                             <p style={{ fontSize: '14px', margin: '0 0 6px 0' }}><strong>AI Confidence:</strong> {typeof res.confidence === "number" ? Math.round(res.confidence * 100) + '%' : 'N/A'}</p>
-                             {typeof res.confidence === "number" && (
-                               <div style={{ width: '100%', height: '8px', backgroundColor: '#e5e7eb', borderRadius: '4px', overflow: 'hidden' }}>
-                                 <div style={{ width: `${Math.round(res.confidence * 100)}%`, height: '100%', backgroundColor: '#059669' }} />
-                               </div>
-                             )}
-                          </div>
-                          <div style={{ flexShrink: 0 }}>
-                             {(res.thumbBase64 || res.preview) ? (
-                               <img src={res.thumbBase64 || res.preview} alt="Crop" style={{ width: '110px', height: '110px', objectFit: 'cover', borderRadius: '8px', border: '2px solid #e5e7eb' }} crossOrigin="anonymous" />
-                             ) : (
-                               <div style={{ width: '110px', height: '110px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6', borderRadius: '8px', border: '2px dashed #d1d5db' }}>
-                                 <span style={{ fontSize: '36px' }}>🌱</span>
-                               </div>
-                             )}
-                          </div>
-                        </div>
-
-                        <h3 style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', color: '#111827', fontSize: '16px', margin: '0 0 6px 0' }}>AI Action Plan</h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '10px' }}>
-                           <div style={{ padding: '8px', backgroundColor: '#f0fdf4', borderRadius: '6px', borderLeft: '3px solid #10b981' }}>
-                             <strong style={{ fontSize: '14px', display: 'block', marginBottom: '2px', color: '#065f46' }}>🌿 Treatment Procedure</strong>
-                             <span style={{ fontSize: '13px', color: '#064e3b', lineHeight: '1.3' }}>{res.procedure}</span>
-                           </div>
-                           <div style={{ padding: '8px', backgroundColor: '#fffbeb', borderRadius: '6px', borderLeft: '3px solid #f59e0b' }}>
-                             <strong style={{ fontSize: '14px', display: 'block', marginBottom: '2px', color: '#92400e' }}>🛡️ Precaution & Prevention</strong>
-                             <span style={{ fontSize: '13px', color: '#78350f', lineHeight: '1.3' }}>{res.prevention}</span>
-                           </div>
-                           <div style={{ padding: '8px', backgroundColor: '#eff6ff', borderRadius: '6px', borderLeft: '3px solid #3b82f6' }}>
-                             <strong style={{ fontSize: '14px', display: 'block', marginBottom: '2px', color: '#1e40af' }}>🌾 Fertilizer Recommendation</strong>
-                             <span style={{ fontSize: '13px', color: '#1e3a8a', lineHeight: '1.3' }}>{res.fertilizer}</span>
-                           </div>
-                        </div>
-
-                        {(() => {
-                          const soilAdvice = generateYieldAdvice(res.disease);
-                          return (
-                            <>
-                              <h3 style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', margin: '10px 0 6px 0', color: '#111827', fontSize: '16px' }}>Soil Health & Mechanics</h3>
-                              <div style={{ display: 'flex', gap: '15px', alignItems: 'center', backgroundColor: '#fafafa', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
-                                <div style={{ flex: 1, fontSize: '13px', lineHeight: '1.3' }}>
-                                   <p style={{ margin: '0 0 4px 0' }}><strong>Optimum Soil Type:</strong> {soilAdvice.type}</p>
-                                   <p style={{ margin: '0 0 4px 0' }}><strong>Fertility Status:</strong> {soilAdvice.fertility}</p>
-                                   <p style={{ margin: '0 0 6px 0' }}><strong>Required Soil Action:</strong> {soilAdvice.action}</p>
-                                   
-                                   <div style={{ width: '100%' }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', fontSize: '11px', fontWeight: 'bold', color: '#4b5563' }}>
-                                         <span>Poor</span>
-                                         <span>Optimal</span>
-                                      </div>
-                                      <div style={{ width: '100%', height: '8px', backgroundColor: '#e5e7eb', borderRadius: '4px', overflow: 'hidden' }}>
-                                         <div style={{ width: `${soilAdvice.healthScore}%`, height: '100%', backgroundColor: soilAdvice.healthScore > 75 ? '#10b981' : soilAdvice.healthScore > 50 ? '#f59e0b' : '#ef4444' }} />
-                                      </div>
-                                   </div>
-                                </div>
-                                <div style={{ textAlign: 'center', padding: '6px', backgroundColor: '#ffffff', borderRadius: '50%', width: '80px', height: '80px', display: 'flex', flexDirection: 'column', justifyContent: 'center', border: '3px solid', borderColor: soilAdvice.healthScore > 75 ? '#10b981' : soilAdvice.healthScore > 50 ? '#f59e0b' : '#ef4444' }}>
-                                   <span style={{ fontSize: '24px', fontWeight: 'bold', color: soilAdvice.healthScore > 75 ? '#10b981' : soilAdvice.healthScore > 50 ? '#f59e0b' : '#ef4444' }}>{soilAdvice.healthScore}</span>
-                                   <span style={{ fontSize: '9px', color: '#6b7280', fontWeight: 'bold' }}>SCORE</span>
-                                </div>
-                              </div>
-                            </>
-                          );
-                        })()}
-
-                        <div style={{ marginTop: '10px', paddingTop: '8px', textAlign: 'center', borderTop: '1px solid #e5e7eb', color: '#6b7280', fontSize: '12px' }}>
-                          <span>Generated by </span><strong style={{ color: '#059669' }}>Sahbaz</strong>
-                        </div>
+                      <div id={`pdf-template-upload-${i}`} style={{ display: "none" }}>
+                        <PdfReportTemplate
+                          data={buildPdfReportData({
+                            scan: res,
+                            index: i,
+                            reportName: res.filename || `Scan Report ${i + 1}`,
+                            userName,
+                            scanSource: res.scanSource || "Upload",
+                          })}
+                        />
                       </div>
 
                     </div>
@@ -734,7 +727,7 @@ export default function Upload() {
                           {new Date(h.date).toLocaleDateString()}
                         </span>
                         {typeof h.confidence === "number" && (
-                          <span className="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                          <span className="badge" style={{ background: "rgba(124, 58, 237, 0.12)", color: "var(--accent)", border: "1px solid rgba(124, 58, 237, 0.22)" }}>
                             {Math.round(h.confidence * 100)}% Conf
                           </span>
                         )}

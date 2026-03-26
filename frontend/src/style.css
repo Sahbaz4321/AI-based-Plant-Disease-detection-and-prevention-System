@@ -1,11 +1,12 @@
 body {
   font-family: 'Poppins', sans-serif;
-  background: #f5f8f3;
+  background: #F8FAF9;
   margin: 0;
+  color: #111827;
 }
 
 .nav {
-  background: #2e7d32;
+  background: linear-gradient(135deg, #166534, #22C55E);
   color: white;
   padding: 12px 24px;
   display: flex;
@@ -25,15 +26,15 @@ body {
 
 .container {
   max-width: 800px;
-  background: white;
+  background: #FFFFFF;
   margin: 30px auto;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 16px 40px rgba(17, 24, 39, 0.08);
 }
 
 button {
-  background: #2e7d32;
+  background: linear-gradient(135deg, #166534, #22C55E);
   color: white;
   border: none;
   padding: 8px 14px;
@@ -42,7 +43,7 @@ button {
 }
 
 button:hover {
-  background: #256328;
+  filter: brightness(0.96);
 }
 
 input[type="file"] {
@@ -51,7 +52,7 @@ input[type="file"] {
 
 .card {
   padding: 15px;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(22, 101, 52, 0.12);
   border-radius: 8px;
   margin-bottom: 12px;
 }

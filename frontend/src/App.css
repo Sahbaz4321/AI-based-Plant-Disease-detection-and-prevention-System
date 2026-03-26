@@ -2,8 +2,61 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  position: relative;
 }
 
 .App main {
   flex: 1;
+}
+
+.app-shell {
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+.app-shell__orb,
+.app-shell__grid {
+  pointer-events: none;
+  position: fixed;
+  z-index: 0;
+}
+
+.app-shell__orb {
+  width: 32rem;
+  height: 32rem;
+  border-radius: 999px;
+  filter: blur(28px);
+  opacity: 0.42;
+}
+
+.app-shell__orb--one {
+  top: -10rem;
+  right: -8rem;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.28) 0%, rgba(124, 58, 237, 0) 72%);
+}
+
+.app-shell__orb--two {
+  bottom: -14rem;
+  left: -10rem;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.24) 0%, rgba(167, 139, 250, 0) 72%);
+}
+
+.app-shell__grid {
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(124, 58, 237, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), transparent 70%);
+}
+
+.page-wrap,
+.navbar,
+footer {
+  position: relative;
+  z-index: 1;
+}
+
+.navbar {
+  z-index: 1200;
 }

@@ -17,8 +17,9 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const res = await login(form.email, form.password);
+
     if (res.success) {
-      showToast(`Welcome back, ${res.user.name}!`, "info");
+      showToast("Welcome back.", "info");
       navigate("/dashboard");
     } else {
       showToast(res.error || "Login failed", "error");
@@ -26,35 +27,52 @@ export default function Login() {
   };
 
   return (
-    <div className="container d-flex align-items-center justify-content-center" style={{ minHeight: "calc(100vh - 200px)" }}>
-      <div className="stagger w-100" style={{ maxWidth: "420px" }}>
-        {/* Header */}
-        <div className="text-center mb-4">
-          <div
-            className="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
-            style={{ width: 64, height: 64, background: "var(--accent-muted)", color: "var(--accent)" }}
-          >
-            <i className="bi bi-person-circle" style={{ fontSize: "2rem" }} />
-          </div>
-          <h1 className="h3 fw-bold mb-1" style={{ color: "var(--text-primary)" }}>Welcome back</h1>
-          <p className="mb-0" style={{ color: "var(--text-muted)" }}>
-            Sign in to your AgroScan account
+    <div className="container auth-shell d-flex align-items-center">
+      <div className="stagger w-100 auth-panel">
+        <section className="auth-showcase">
+          <span className="section-kicker mb-3" style={{ color: "white", background: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.16)" }}>
+            <i className="bi bi-shield-check" />
+            Protected workspace
+          </span>
+          <h1 className="display-6 fw-bold mb-3 position-relative">Welcome back to AgroScan.</h1>
+          <p className="mb-4 position-relative" style={{ maxWidth: "30rem", opacity: 0.92 }}>
+            Open your farm dashboard, continue previous scans, and review care suggestions without dealing with cluttered screens.
           </p>
-        </div>
+          <div className="row g-3 position-relative">
+            <div className="col-sm-6">
+              <div className="auth-metric h-100">
+                <div className="small text-uppercase fw-bold mb-1" style={{ letterSpacing: "0.07em" }}>Fast diagnosis</div>
+                <div className="fw-semibold">Upload photos and get disease insights in one focused flow.</div>
+              </div>
+            </div>
+            <div className="col-sm-6">
+              <div className="auth-metric h-100">
+                <div className="small text-uppercase fw-bold mb-1" style={{ letterSpacing: "0.07em" }}>Organized history</div>
+                <div className="fw-semibold">Keep recent scan results ready for action and reporting.</div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-        {/* Form card */}
-        <div className="glass-lg rounded-4 p-4 p-md-5">
+        <section className="glass-lg auth-form-card">
+          <div className="mb-4">
+            <div
+              className="mb-3 d-inline-flex align-items-center justify-content-center rounded-circle"
+              style={{ width: 64, height: 64, background: "var(--accent-muted)", color: "var(--accent)" }}
+            >
+              <i className="bi bi-person-circle" style={{ fontSize: "2rem" }} />
+            </div>
+            <h2 className="h3 fw-bold mb-1" style={{ color: "var(--text-primary)" }}>Sign in</h2>
+            <p className="mb-0" style={{ color: "var(--text-muted)" }}>Access your crop monitoring workspace.</p>
+          </div>
+
           <form onSubmit={handleSubmit}>
-            {/* Email */}
             <div className="mb-3">
               <label className="form-label small fw-semibold" style={{ color: "var(--text-secondary)" }}>
                 Email address
               </label>
               <div className="position-relative">
-                <span
-                  className="position-absolute top-50 translate-middle-y"
-                  style={{ left: 14, color: "var(--text-muted)" }}
-                >
+                <span className="field-icon">
                   <i className="bi bi-envelope" />
                 </span>
                 <input
@@ -70,23 +88,19 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Password */}
             <div className="mb-4">
               <label className="form-label small fw-semibold" style={{ color: "var(--text-secondary)" }}>
                 Password
               </label>
               <div className="position-relative">
-                <span
-                  className="position-absolute top-50 translate-middle-y"
-                  style={{ left: 14, color: "var(--text-muted)" }}
-                >
+                <span className="field-icon">
                   <i className="bi bi-lock" />
                 </span>
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
                   className="form-control ps-5 pe-5"
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   value={form.password}
                   onChange={handleChange}
                   required
@@ -94,8 +108,7 @@ export default function Login() {
                 />
                 <button
                   type="button"
-                  className="btn btn-link position-absolute top-50 translate-middle-y p-0 border-0"
-                  style={{ right: 14, color: "var(--text-muted)" }}
+                  className="btn btn-link field-action p-0 border-0"
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
                 >
@@ -104,12 +117,11 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Submit */}
-            <button type="submit" className="btn btn-agro w-100 py-2" disabled={loading}>
+            <button type="submit" className="btn btn-agro w-100 py-3" disabled={loading}>
               {loading ? (
                 <>
                   <span className="spinner-border spinner-border-sm me-2" role="status" />
-                  Signing in…
+                  Signing in...
                 </>
               ) : (
                 <>
@@ -120,38 +132,34 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Divider */}
           <div className="d-flex align-items-center my-4">
             <hr className="flex-grow-1" style={{ borderColor: "var(--border)" }} />
             <span className="px-3 small" style={{ color: "var(--text-muted)" }}>or</span>
             <hr className="flex-grow-1" style={{ borderColor: "var(--border)" }} />
           </div>
 
-          {/* Demo login */}
           <button
             type="button"
-            className="btn btn-outline-secondary w-100 py-2 mb-3"
+            className="btn btn-outline-secondary w-100 py-3 mb-3"
             onClick={async () => {
               const res = await login("demo@agroscan.com", "demo123");
               if (res.success) {
-                showToast(`Welcome, ${res.user.name}! (Demo account)`, "info");
                 navigate("/dashboard");
               }
             }}
             disabled={loading}
           >
             <i className="bi bi-lightning me-2" />
-            Try Demo Account
+            Try demo account
           </button>
 
-          {/* Signup link */}
           <p className="text-center mb-0 small" style={{ color: "var(--text-muted)" }}>
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link to="/signup" className="fw-semibold text-decoration-none" style={{ color: "var(--accent)" }}>
-              Sign up
+              Create one
             </Link>
           </p>
-        </div>
+        </section>
       </div>
     </div>
   );

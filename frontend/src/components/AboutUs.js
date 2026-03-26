@@ -9,7 +9,7 @@ export default function AboutUs() {
             className="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
             style={{ width: 80, height: 80, background: "var(--accent-muted)", color: "var(--accent)", fontSize: "2rem" }}
           >
-            🌱
+            <i className="bi bi-tree-fill" />
           </div>
           <h1 className="h2 fw-bold mb-2" style={{ color: "var(--text-primary)" }}>About AgroScan</h1>
           <p className="text-muted" style={{ fontSize: "1.1rem" }}>
@@ -20,7 +20,7 @@ export default function AboutUs() {
         <div className="glass-lg rounded-4 p-4 p-md-5 mb-4">
           <h2 className="h4 fw-bold mb-3" style={{ color: "var(--text-primary)" }}>Our Mission</h2>
           <p style={{ color: "var(--text-secondary)", lineHeight: "1.7" }}>
-            AgroScan aims to revolutionize agriculture by putting the power of advanced crop disease detection into the hands of every farmer. By utilizing state-of-the-art AI and machine learning techniques, we deliver quick, accurate diagnoses and actionable care tips—minimizing crop loss and maximizing yield.
+            AgroScan aims to revolutionize agriculture by putting the power of advanced crop disease detection into the hands of every farmer. By utilizing state-of-the-art AI and machine learning techniques, we deliver quick, accurate diagnoses and actionable care tips, minimizing crop loss and maximizing yield.
           </p>
         </div>
 

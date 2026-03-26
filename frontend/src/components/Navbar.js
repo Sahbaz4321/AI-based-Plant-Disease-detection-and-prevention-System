@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 
 const navLinks = [
   { to: "/dashboard", label: "Dashboard", icon: "bi-grid-1x2" },
@@ -29,20 +29,36 @@ export default function Navbar() {
       className="navbar navbar-expand-lg sticky-top"
       style={{
         background: "var(--nav-bg)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
         borderBottom: "1px solid var(--nav-border)",
         boxShadow: "var(--shadow)",
       }}
     >
-      <div className="container">
+      <div className="container py-2">
         <Link
           to={isAuthenticated ? "/dashboard" : "/login"}
           className="navbar-brand d-flex align-items-center gap-2 text-decoration-none"
           style={{ fontWeight: 800, color: "var(--text-primary)", fontSize: "1.25rem" }}
         >
-          <span style={{ fontSize: "1.5rem" }}>🌱</span>
-          <span>AgroScan</span>
+          <span
+            className="d-inline-flex align-items-center justify-content-center rounded-circle"
+            style={{
+              width: 42,
+              height: 42,
+              background: "linear-gradient(135deg, var(--gradient-start), var(--gradient-end))",
+              color: "white",
+              boxShadow: "var(--hero-shadow)",
+            }}
+          >
+            <i className="bi bi-tree-fill" />
+          </span>
+          <div className="d-flex flex-column">
+            <span>AgroScan</span>
+            <span className="small fw-medium" style={{ color: "var(--text-muted)", fontSize: "0.72rem" }}>
+              Crop intelligence studio
+            </span>
+          </div>
         </Link>
 
         <button
@@ -56,19 +72,19 @@ export default function Navbar() {
         </button>
 
         <div className={`collapse navbar-collapse ${open ? "show" : ""}`} id="navbarNav">
-          <ul className="navbar-nav ms-auto align-items-lg-center gap-1">
+          <ul className="navbar-nav ms-auto align-items-lg-center gap-2 nav-shell">
             {isAuthenticated &&
               navLinks.map(({ to, label, icon }) => (
                 <li key={to} className="nav-item">
                   <Link
                     to={to}
-                    className={`nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3 ${
+                    className={`nav-link nav-pill d-flex align-items-center gap-2 px-3 py-2 ${
                       location.pathname === to ? "active" : ""
                     }`}
                     onClick={() => setOpen(false)}
                     style={{
                       color: location.pathname === to ? "var(--accent)" : "var(--text-secondary)",
-                      fontWeight: location.pathname === to ? 600 : 500,
+                      fontWeight: location.pathname === to ? 700 : 500,
                       background: location.pathname === to ? "var(--accent-muted)" : "transparent",
                     }}
                   >
@@ -78,12 +94,11 @@ export default function Navbar() {
                 </li>
               ))}
 
-            {/* Auth section */}
             {isAuthenticated ? (
               <li className="nav-item ms-lg-2 position-relative">
                 <button
                   type="button"
-                  className="btn d-flex align-items-center gap-2 px-3 py-2 rounded-3 border-0"
+                  className="btn d-flex align-items-center gap-2 px-3 py-2 rounded-pill border-0"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   style={{ background: "var(--accent-muted)", color: "var(--text-primary)" }}
                 >
@@ -105,66 +120,41 @@ export default function Navbar() {
 
                 {dropdownOpen && (
                   <div
-                    className="position-absolute end-0 mt-2 rounded-3 shadow-lg animate-fade-in"
+                    className="position-absolute end-0 mt-2 rounded-4 shadow-lg animate-fade-in"
                     style={{
-                      background: dark ? "#111827" : "#ffffff", // Changed from var(--bg-card) which was transparent
+                      background: dark ? "#111827" : "#ffffff",
                       border: "1px solid var(--border)",
-                      minWidth: 200,
+                      minWidth: 220,
                       zIndex: 1050,
                     }}
                   >
-                    <div className="p-3 border-bottom text-center" style={{ borderColor: "var(--border) !important" }}>
+                    <div className="p-3 border-bottom text-center" style={{ borderColor: "var(--border)" }}>
                       <div className="fw-bold fs-5" style={{ color: "var(--text-primary)" }}>{user?.name}</div>
                     </div>
                     <div className="p-2">
-                      <Link
-                        to="/profile"
-                        className="btn w-100 text-start d-flex align-items-center gap-2 px-3 py-2 rounded-2 border-0 text-decoration-none"
-                        onClick={() => setDropdownOpen(false)}
-                        style={{ background: "transparent", color: "var(--text-secondary)" }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-muted)")}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                      >
-                        <i className="bi bi-person-circle" />
-                        Profile
-                      </Link>
-                      <Link
-                        to="/about"
-                        className="btn w-100 text-start d-flex align-items-center gap-2 px-3 py-2 rounded-2 border-0 text-decoration-none"
-                        onClick={() => setDropdownOpen(false)}
-                        style={{ background: "transparent", color: "var(--text-secondary)" }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-muted)")}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                      >
-                        <i className="bi bi-info-circle" />
-                        About Us
-                      </Link>
-                      <Link
-                        to="/reports"
-                        className="btn w-100 text-start d-flex align-items-center gap-2 px-3 py-2 rounded-2 border-0 text-decoration-none"
-                        onClick={() => setDropdownOpen(false)}
-                        style={{ background: "transparent", color: "var(--text-secondary)" }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-muted)")}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                      >
-                        <i className="bi bi-folder-check" />
-                        My Reports
-                      </Link>
-                      <Link
-                        to="/contact"
-                        className="btn w-100 text-start d-flex align-items-center gap-2 px-3 py-2 rounded-2 border-0 text-decoration-none"
-                        onClick={() => setDropdownOpen(false)}
-                        style={{ background: "transparent", color: "var(--text-secondary)" }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-muted)")}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                      >
-                        <i className="bi bi-envelope" />
-                        Contact Us
-                      </Link>
+                      {[
+                        { to: "/profile", icon: "bi-person-circle", label: "Profile" },
+                        { to: "/about", icon: "bi-info-circle", label: "About Us" },
+                        { to: "/reports", icon: "bi-folder-check", label: "My Reports" },
+                        { to: "/contact", icon: "bi-envelope", label: "Contact Us" },
+                      ].map((item) => (
+                        <Link
+                          key={item.to}
+                          to={item.to}
+                          className="btn w-100 text-start d-flex align-items-center gap-2 px-3 py-2 rounded-3 border-0 text-decoration-none"
+                          onClick={() => setDropdownOpen(false)}
+                          style={{ background: "transparent", color: "var(--text-secondary)" }}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-muted)")}
+                          onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                        >
+                          <i className={`bi ${item.icon}`} />
+                          {item.label}
+                        </Link>
+                      ))}
                       <hr className="my-1 mx-2" style={{ borderColor: "var(--border)" }} />
                       <button
                         type="button"
-                        className="btn w-100 text-start d-flex align-items-center gap-2 px-3 py-2 rounded-2 border-0 text-decoration-none"
+                        className="btn w-100 text-start d-flex align-items-center gap-2 px-3 py-2 rounded-3 border-0 text-decoration-none"
                         onClick={toggleTheme}
                         style={{ background: "transparent", color: "var(--text-secondary)" }}
                         onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-muted)")}
@@ -176,7 +166,7 @@ export default function Navbar() {
                       <hr className="my-1 mx-2" style={{ borderColor: "var(--border)" }} />
                       <button
                         type="button"
-                        className="btn w-100 text-start d-flex align-items-center gap-2 px-3 py-2 rounded-2 border-0"
+                        className="btn w-100 text-start d-flex align-items-center gap-2 px-3 py-2 rounded-3 border-0"
                         onClick={handleLogout}
                         style={{ background: "transparent", color: "#ef4444" }}
                         onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)")}
@@ -194,7 +184,7 @@ export default function Navbar() {
                 <li className="nav-item ms-lg-2">
                   <button
                     type="button"
-                    className="btn btn-link nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3 text-decoration-none border-0"
+                    className="btn btn-link nav-link nav-pill d-flex align-items-center gap-2 px-3 py-2 text-decoration-none border-0"
                     onClick={toggleTheme}
                     aria-label="Toggle theme"
                     style={{ color: "var(--text-secondary)" }}
@@ -206,11 +196,11 @@ export default function Navbar() {
                 <li className="nav-item">
                   <Link
                     to="/login"
-                    className="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3"
+                    className="nav-link nav-pill d-flex align-items-center gap-2 px-3 py-2"
                     onClick={() => setOpen(false)}
                     style={{
                       color: location.pathname === "/login" ? "var(--accent)" : "var(--text-secondary)",
-                      fontWeight: location.pathname === "/login" ? 600 : 500,
+                      fontWeight: location.pathname === "/login" ? 700 : 500,
                       background: location.pathname === "/login" ? "var(--accent-muted)" : "transparent",
                     }}
                   >
