@@ -70,43 +70,43 @@ After prediction, the system generates:
 
 ### Dashboard
 
-![Dashboard](./backend/images/Screenshot%202026-03-30%20231251.png)
+![Dashboard](./screenshots/dashboard.png)
 
 ### Scan Upload
 
-![Scan Upload](./backend/images/Screenshot%202026-03-30%20232942.png)
+![Scan Upload](./screenshots/scan-upload.png)
 
 ### Analysis Result and PDF Report
 
 Detailed AI analysis with treatment suggestions, prevention strategy, and one-click PDF report download.
 
-![Analysis Result and PDF Report](./backend/images/Screenshot%202026-03-30%20233144.png)
+![Analysis Result and PDF Report](./screenshots/analysis-pdf.png)
 
 ### Soil Information
 
-![Soil Information](./backend/images/Screenshot%202026-03-30%20233239.png)
+![Soil Information](./screenshots/soil-info.png)
 
 ### Reports Library
 
-![Reports Library](./backend/images/Screenshot%202026-03-30%20233403.png)
+![Reports Library](./screenshots/reports-library.png)
 
 ### Additional Screens
 
 Profile
 
-![Profile](./backend/images/Screenshot%202026-03-30%20231155.png)
+![Profile](./screenshots/profile.png)
 
 Feedback
 
-![Feedback](./backend/images/Screenshot%202026-03-30%20233334.png)
+![Feedback](./screenshots/feedback.png)
 
 Login
 
-![Login](./backend/images/Screenshot%202026-03-30%20230758.png)
+![Login](./screenshots/login.png)
 
 Sign Up
 
-![Sign Up](./backend/images/Screenshot%202026-03-30%20230828.png)
+![Sign Up](./screenshots/signup.png)
 
 ## :hammer_and_wrench: Tech Stack
 
