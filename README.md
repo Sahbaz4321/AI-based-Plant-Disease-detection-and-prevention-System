@@ -70,43 +70,50 @@ After prediction, the system generates:
 
 ### Dashboard
 
-![Dashboard](./screenshots/dashboard.png)
+ 
+
+<img width="1909" height="909" alt="Screenshot 2026-03-30 231251" src="https://github.com/user-attachments/assets/5ad09786-8825-46c2-9218-cacd1b907909" />
+
+
+
 
 ### Scan Upload
 
-![Scan Upload](./screenshots/scan-upload.png)
+ 
+<img width="1907" height="909" alt="Screenshot 2026-03-30 232942" src="https://github.com/user-attachments/assets/96e9aad9-7e71-4e7a-b2ef-6f54a5137240" />
 
 ### Analysis Result and PDF Report
 
 Detailed AI analysis with treatment suggestions, prevention strategy, and one-click PDF report download.
 
-![Analysis Result and PDF Report](./screenshots/analysis-pdf.png)
+<img width="1910" height="915" alt="Screenshot 2026-03-30 233144" src="https://github.com/user-attachments/assets/97c4614c-35a8-4241-8a07-2783793e4af8" />
 
 ### Soil Information
 
-![Soil Information](./screenshots/soil-info.png)
+<img width="1904" height="895" alt="Screenshot 2026-03-30 233239" src="https://github.com/user-attachments/assets/e270c8cb-85b7-48bb-8b0e-7106232badec" />
 
 ### Reports Library
 
-![Reports Library](./screenshots/reports-library.png)
+<img width="1914" height="938" alt="Screenshot 2026-03-30 233403" src="https://github.com/user-attachments/assets/9fce0793-cf3d-40ba-9cdf-5c112ae83e9e" />
 
 ### Additional Screens
 
 Profile
 
 ![Profile](./screenshots/profile.png)
+<img width="1909" height="903" alt="profile" src="https://github.com/user-attachments/assets/36d1a424-ce34-4fd1-a107-26193e991c23" />
 
 Feedback
 
-![Feedback](./screenshots/feedback.png)
+<img width="1912" height="907" alt="Screenshot 2026-03-30 233334" src="https://github.com/user-attachments/assets/5a57a679-1cea-4abc-9a33-ea593073e2d1" />
 
 Login
 
-![Login](./screenshots/login.png)
+<img width="1915" height="911" alt="Screenshot 2026-03-30 230758" src="https://github.com/user-attachments/assets/c010591c-acdd-4740-96ff-95ee4ab49a20" />
 
 Sign Up
 
-![Sign Up](./screenshots/signup.png)
+<img width="1905" height="911" alt="Screenshot 2026-03-30 230828" src="https://github.com/user-attachments/assets/aea9cf87-7222-4f5f-b8df-511612e3adb2" />
 
 ## :hammer_and_wrench: Tech Stack
 
