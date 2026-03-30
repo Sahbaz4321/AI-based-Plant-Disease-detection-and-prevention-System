@@ -9,96 +9,138 @@
 </p>
 
 <p align="center">
-  🌱 Detect plant diseases • 🤖 Get AI recommendations • 📄 Download & Share Reports
+  :seedling: Detect plant diseases • :robot: Get AI recommendations • :page_facing_up: Download & Share Reports
 </p>
 
 <p align="center">
   An AI-powered full-stack agriculture project for smart plant disease detection, recommendation generation, and PDF-based reporting.
 </p>
 
-## 🚀 Overview
+## :rocket: Overview
 
-This project is built to solve a practical agricultural problem: helping users identify plant diseases quickly and respond with better treatment decisions.
+This project is built to solve a practical agricultural problem by helping users identify plant diseases quickly and take better treatment decisions.
 
-The system combines a Python Flask prediction backend, deep learning for image-based disease detection, Generative AI for detailed recommendations, and Firebase for authentication and history tracking.
+The core backend is built with Python Flask for plant disease prediction, while the overall system also uses Node.js where needed for orchestration and request handling. The platform combines deep learning, Generative AI, and Firebase services into one modern workflow.
 
-## ✨ Highlights
+## :sparkles: Highlights
 
-- 🌿 AI-based leaf disease detection using a trained Keras model
-- 📊 Confidence score for every prediction
-- 🤖 AI-generated recommendations for treatment and prevention
-- 📄 Downloadable report in `.pdf` format
-- 🔐 Firebase authentication and user-specific history
-- 📱 Responsive UI for desktop and mobile
+- :herb: AI-based leaf disease detection using a trained Keras model
+- :bar_chart: Confidence score for every prediction
+- :robot: AI-generated recommendations for treatment and prevention
+- :page_facing_up: Downloadable report in `.pdf` format
+- :lock: Firebase authentication and prediction history
+- :iphone: Responsive UI for desktop and mobile
 
-## 🧩 Core Features
+## :jigsaw: Core Features
 
-### 🧠 Disease Detection
+### :brain: AI Disease Detection
 
-- 📸 Upload a plant leaf image
-- 🔍 Predict the disease from the trained model
-- 🏷 Display the predicted class with confidence
-- 🌱 Support a dataset trained on 87,000+ images and 38 disease classes
+- :camera_flash: Upload a plant leaf image
+- :mag: Detect disease using the trained EfficientNet-based model
+- :label: Show predicted class with confidence score
+- :seedling: Support a dataset trained on 87,000+ images across 38 disease classes
 
-### 🤖 AI Recommendations
+### :robot: Smart Recommendations
 
-The recommendation engine generates:
+After prediction, the system generates:
 
-- 🌿 Disease explanation
-- ⚠ Likely causes
-- 🛡 Prevention methods
-- 💊 Fertilizer suggestions
-- 🧪 Pesticide suggestions
-- ⏳ Expected recovery time
-- 💡 Extra care tips
+- :herb: Disease explanation
+- :warning: Causes
+- :shield: Prevention methods
+- :pill: Fertilizer suggestions
+- :test_tube: Pesticide suggestions
+- :hourglass_flowing_sand: Recovery time
+- :bulb: Extra care tips
 
-### 📄 Report Management
+### :page_facing_up: Report Management
 
-- Generate structured reports after prediction
-- Download reports in `.pdf` format
-- Share results easily with a clean summary layout
+- Generate a structured result summary
+- Download the final report in `.pdf` format
+- Share prediction results easily
 
-### 🎨 User Experience
+### :art: User Experience
 
-- 🔐 Secure login and signup with Firebase
-- 🧭 Protected dashboard
-- 🕘 Prediction history tracking
-- ✨ Clean and responsive interface
-- 🌙 Dark and light theme support
+- :lock: Secure login and signup with Firebase
+- :compass: Protected dashboard
+- :clock3: Prediction history tracking
+- :sparkles: Clean and responsive interface
+- :crescent_moon: Dark and light theme support
 
-## 🛠 Tech Stack
+## :camera: Application Preview
+
+### Dashboard
+
+![Dashboard](./backend/images/Screenshot%202026-03-30%20231251.png)
+
+### Scan Upload
+
+![Scan Upload](./backend/images/Screenshot%202026-03-30%20232942.png)
+
+### Analysis Result and PDF Report
+
+Detailed AI analysis with treatment suggestions, prevention strategy, and one-click PDF report download.
+
+![Analysis Result and PDF Report](./backend/images/Screenshot%202026-03-30%20233144.png)
+
+### Soil Information
+
+![Soil Information](./backend/images/Screenshot%202026-03-30%20233239.png)
+
+### Reports Library
+
+![Reports Library](./backend/images/Screenshot%202026-03-30%20233403.png)
+
+### Additional Screens
+
+Profile
+
+![Profile](./backend/images/Screenshot%202026-03-30%20231155.png)
+
+Feedback
+
+![Feedback](./backend/images/Screenshot%202026-03-30%20233334.png)
+
+Login
+
+![Login](./backend/images/Screenshot%202026-03-30%20230758.png)
+
+Sign Up
+
+![Sign Up](./backend/images/Screenshot%202026-03-30%20230828.png)
+
+## :hammer_and_wrench: Tech Stack
 
 | Layer | Technologies |
 | --- | --- |
 | Frontend | React, Vite, Axios |
 | Backend | Python Flask, Node.js, Express |
-| ML API | Flask, TensorFlow, Keras |
+| AI / ML | TensorFlow, Keras, EfficientNet |
 | AI Integration | Google Gemini API |
 | Auth & Database | Firebase Authentication, Firestore |
 | Reporting | jsPDF, html2canvas |
 
-## 🏗 Architecture
+## :classical_building: System Architecture
 
 ```text
 React Frontend
     |
     v
-Python Flask Prediction Backend
+Python Flask Backend
     |
     +--> EfficientNet / Keras Model
     |
-    +--> Gemini AI Recommendations
+    +--> Gemini AI Recommendation Layer
     |
     +--> PDF Report Generation
     |
     v
 Firebase Auth + Firestore
 
-Supporting Layer:
-Node / Express is used in the project for request handling and orchestration where needed.
+Supporting Service:
+Node / Express is used in the project for request handling and integration support.
 ```
 
-## 📁 Project Structure
+## :file_folder: Project Structure
 
 ```text
 PlantDisease/
@@ -118,17 +160,17 @@ PlantDisease/
 `-- README.md
 ```
 
-## 🔄 Workflow
+## :arrows_clockwise: Workflow
 
-1. User signs in to the application.
+1. User logs in to the application.
 2. A plant leaf image is uploaded from the dashboard.
-3. The Python backend processes the image for model inference.
-4. The ML pipeline predicts the disease and confidence score.
-5. Gemini generates treatment and prevention guidance.
-6. The result is shown in the UI and exported as a `.pdf` report when needed.
-7. Prediction history is saved for later access.
+3. The Python backend processes the image and runs model inference.
+4. The system predicts the disease and confidence score.
+5. Gemini generates smart recommendations for treatment and prevention.
+6. The result is displayed in the UI and can be exported as a `.pdf` report.
+7. Prediction history is stored for future tracking.
 
-## ⚙ Installation
+## :gear: Installation
 
 ### 1. Clone the repository
 
@@ -163,7 +205,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-## 🔑 Environment Variables
+## :key: Environment Variables
 
 Create a `.env` file in `backend/` and add the required keys:
 
@@ -174,7 +216,7 @@ FIREBASE_API_KEY=your_firebase_api_key
 
 Add any other Firebase configuration values used by your frontend setup as needed.
 
-## 📊 Example Output
+## :bar_chart: Example Output
 
 ```text
 Disease: Tomato Leaf Blight
@@ -196,34 +238,34 @@ Report:
 Download available in PDF format
 ```
 
-## 🎯 Use Cases
+## :dart: Use Cases
 
-- 👨‍🌾 Farmers and field workers
-- 🎓 Agriculture students
-- 🔬 Plant disease researchers
-- 💻 Agritech demo projects
-- 🌍 Smart farming solutions
+- Farmers and field workers
+- Agriculture students
+- Plant disease researchers
+- Agritech demo projects
+- Smart farming solutions
 
-## 💡 Future Scope
+## :bulb: Future Scope
 
-- 🌐 Multi-language support
-- 🎙 Voice-based guidance
-- 📱 Mobile application
-- ☁ Weather-aware recommendations
-- 📡 Offline prediction mode
+- Multi-language support
+- Voice-based guidance
+- Mobile application
+- Weather-aware recommendations
+- Offline prediction mode
 
-## 🏆 Why This Project Stands Out
+## :trophy: Why This Project Stands Out
 
 - Combines computer vision, Generative AI, and full-stack development
-- Uses a Python-based prediction backend for real ML inference
-- Produces actionable recommendations, not just predictions
+- Uses a Python-based backend for real plant disease prediction
+- Produces actionable recommendations, not just disease names
 - Generates downloadable PDF reports for practical sharing
-- Ready to be extended into a larger agritech platform
+- Ready to scale into a larger agritech platform
 
-## 👨‍💻 Author
+## :man_technologist: Author
 
 Sahbaz Siddique
 
-## ⭐ Support
+## :star: Support
 
 If you like this project, consider starring the repository and sharing it with others.
