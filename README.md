@@ -1,5 +1,17 @@
 # AI-Based Plant Disease Detection & Recommendation System
 
+<p align="center">
+  <img src="https://img.shields.io/badge/AI-Powered-green?style=for-the-badge&logo=leaflet"/>
+  <img src="https://img.shields.io/badge/React-Frontend-blue?style=for-the-badge&logo=react"/>
+  <img src="https://img.shields.io/badge/Python-Flask-yellow?style=for-the-badge&logo=python"/>
+  <img src="https://img.shields.io/badge/Firebase-Database-orange?style=for-the-badge&logo=firebase"/>
+  <img src="https://img.shields.io/badge/Model-EfficientNet-black?style=for-the-badge"/>
+</p>
+
+<p align="center">
+  🌱 Detect plant diseases • 🤖 Get AI recommendations • 📄 Download & Share Reports
+</p>
+
 Detect plant diseases from leaf images, generate AI-powered care recommendations, and create shareable reports from a modern full-stack application.
 
 ## Overview
