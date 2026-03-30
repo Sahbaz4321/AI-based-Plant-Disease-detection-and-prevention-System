@@ -1,131 +1,210 @@
-🌿 AI-Based Plant Disease Detection & Recommendation System
-<p align="center"> <img src="https://img.shields.io/badge/AI-Powered-green?style=for-the-badge&logo=leaflet"/> <img src="https://img.shields.io/badge/React-Frontend-blue?style=for-the-badge&logo=react"/> <img src="https://img.shields.io/badge/Python-Flask-yellow?style=for-the-badge&logo=python"/> <img src="https://img.shields.io/badge/Firebase-Database-orange?style=for-the-badge&logo=firebase"/> <img src="https://img.shields.io/badge/Model-EfficientNet-black?style=for-the-badge"/> </p> <p align="center"> 🌱 Detect plant diseases • 🤖 Get AI recommendations • 📄 Download & Share Reports </p>
-🚀 About the Project
+# AI-Based Plant Disease Detection & Recommendation System
 
-An AI-powered full-stack web application that detects plant diseases from leaf images and provides intelligent recommendations using Generative AI.
+Detect plant diseases from leaf images, generate AI-powered care recommendations, and create shareable reports from a modern full-stack application.
 
-👉 Built to solve real-world agricultural problems and help farmers make better decisions.
+## Overview
 
-✨ Features
-🧠 AI Disease Detection
-📸 Upload plant leaf image
-🔍 Detect disease using trained .keras model
-📊 Confidence score display
-🤖 AI Smart Recommendations
-🌿 Disease Explanation
-⚠️ Causes
-🛡 Prevention
-💊 Fertilizers
-🧪 Pesticides
-⏳ Recovery Time
-💡 Extra Tips
-📄 Report Management
-📥 Download PDF Report
-📤 Share report easily
-📊 Structured & clean report
-🔐 Authentication
-🔑 Firebase Login / Signup
-🔒 Secure dashboard
-📊 History Tracking
-🧾 Save previous predictions
-📈 Track plant health
-🎨 Modern UI
-🌙 Dark / Light Mode
-📱 Fully Responsive
-⚡ Smooth animations
-🧠 Dataset & Model
+This project is built to solve a practical agricultural problem: helping users identify plant diseases quickly and respond with better treatment decisions.
 
-🚀 Trained on:
+The system combines deep learning for image-based disease detection, Generative AI for detailed recommendations, and Firebase for authentication and history tracking.
 
-🌿 87,000+ Leaf Images
-🦠 38 Disease Classes
+## Highlights
 
-⚙️ Model:
+- AI-based leaf disease detection using a trained Keras model
+- Confidence score for every prediction
+- AI-generated recommendations for treatment and prevention
+- Downloadable and shareable reports
+- Firebase authentication and user-specific history
+- Responsive UI for desktop and mobile
 
-EfficientNet-based deep learning model
-Built using TensorFlow & Keras
-🏗️ System Architecture
+## Core Features
+
+### Disease Detection
+
+- Upload a plant leaf image
+- Predict the disease from the trained model
+- Display the predicted class with confidence
+- Support a dataset trained on 87,000+ images and 38 disease classes
+
+### AI Recommendations
+
+The recommendation engine generates:
+
+- Disease explanation
+- Likely causes
+- Prevention methods
+- Fertilizer suggestions
+- Pesticide suggestions
+- Expected recovery time
+- Extra care tips
+
+### Report Management
+
+- Generate structured reports after prediction
+- Download reports as PDF
+- Share results easily
+
+### User Experience
+
+- Secure login and signup with Firebase
+- Protected dashboard
+- Prediction history tracking
+- Clean and responsive interface
+- Dark and light theme support
+
+## Tech Stack
+
+| Layer | Technologies |
+| --- | --- |
+| Frontend | React, Vite, Axios |
+| Backend | Node.js, Express |
+| ML API | Flask, TensorFlow, Keras |
+| AI Integration | Google Gemini API |
+| Auth & Database | Firebase Authentication, Firestore |
+| Reporting | jsPDF, html2canvas |
+
+## Architecture
+
+```text
 React Frontend
-      ↓
-Flask API (Model)
-      ↓
-Gemini AI
-      ↓
-Firebase (Auth + DB)
-🛠️ Tech Stack
-Category	Technologies
-🎨 Frontend	React, Tailwind CSS, Axios, Framer Motion
-⚙️ Backend/API	Python Flask
-🤖 AI/ML	TensorFlow, Keras, EfficientNet
-🧠 AI Integration	Gemini API
-🔐 Database	Firebase Auth & Firestore
-📁 Project Structure
-project-root/
-│
-├── frontend/
-├── python-api/
-├── models/
-└── firebase/
-🔄 Workflow
-Login → Upload Image → AI Prediction → Gemini Recommendation → Result → PDF/Share → Save to Firebase
-⚙️ Installation
-1️⃣ Clone Repository
+    |
+    v
+Node / Express Backend
+    |
+    +--> Flask Prediction API
+    |        |
+    |        v
+    |    Keras Model
+    |
+    +--> Gemini AI Recommendations
+    |
+    v
+Firebase Auth + Firestore
+```
+
+## Project Structure
+
+```text
+PlantDisease/
+|-- frontend/
+|   |-- src/
+|   `-- package.json
+|
+|-- backend/
+|   |-- app.py
+|   |-- node-app.js
+|   |-- predict_worker.py
+|   |-- requirements.txt
+|   |-- package.json
+|   |-- classes.json
+|   `-- final_model_fixed.keras
+|
+`-- README.md
+```
+
+## Workflow
+
+1. User signs in to the application.
+2. A plant leaf image is uploaded from the dashboard.
+3. The backend forwards the image for model inference.
+4. The ML pipeline predicts the disease and confidence score.
+5. Gemini generates treatment and prevention guidance.
+6. The result is shown in the UI and can be downloaded or shared.
+7. Prediction history is saved for later access.
+
+## Installation
+
+### 1. Clone the repository
+
+```bash
 git clone https://github.com/yourusername/plant-disease-detection.git
 cd plant-disease-detection
-2️⃣ Frontend Setup
+```
+
+### 2. Start the frontend
+
+```bash
 cd frontend
 npm install
+npm run dev
+```
+
+### 3. Start the Node backend
+
+```bash
+cd backend
+npm install
 npm start
-3️⃣ Python API Setup
-cd python-api
+```
+
+### 4. Start the Flask prediction API
+
+Open a second terminal:
+
+```bash
+cd backend
 pip install -r requirements.txt
 python app.py
-🔑 Environment Variables
-GEMINI_API_KEY=your_api_key
-FIREBASE_API_KEY=your_key
-📊 Example Output
-🌿 Disease: Tomato Leaf Blight
-📊 Confidence: 94%
+```
 
-⚠️ Causes:
-Fungal infection due to humidity
+## Environment Variables
 
-🛡 Prevention:
-Avoid overwatering
+Create a `.env` file in `backend/` and add the required keys:
 
-💊 Fertilizer:
-Nitrogen-based fertilizer
+```env
+GEMINI_API_KEY=your_gemini_api_key
+FIREBASE_API_KEY=your_firebase_api_key
+```
 
-⏳ Recovery:
-7–14 days
+Add any other Firebase configuration values used by your frontend setup as needed.
 
-📄 Download PDF | 📤 Share
-💡 Future Scope
-🌐 Multi-language support
-🎙 Voice assistant
-📱 Mobile App
-🌦 Weather-based prediction
-📶 Offline mode
-🎯 Use Cases
-👨‍🌾 Farmers
-🎓 Students
-🔬 Researchers
-🌱 Agriculture Experts
-🏆 Highlights
+## Example Output
 
-✔ AI + Full Stack
-✔ Real-world impactful project
-✔ PDF Reports + Sharing
-✔ Clean UI/UX
-✔ Scalable
+```text
+Disease: Tomato Leaf Blight
+Confidence: 94%
 
-👨‍💻 Author
+Cause:
+Fungal infection encouraged by excess moisture and humidity.
+
+Prevention:
+Avoid overwatering, improve airflow, and remove infected leaves.
+
+Suggested Fertilizer:
+Balanced nitrogen support in controlled quantity.
+
+Recovery Time:
+7 to 14 days depending on severity and care.
+```
+
+## Use Cases
+
+- Farmers and field workers
+- Agriculture students
+- Plant disease researchers
+- Agritech demo projects
+- Smart farming solutions
+
+## Future Scope
+
+- Multi-language support
+- Voice-based guidance
+- Mobile application
+- Weather-aware recommendations
+- Offline prediction mode
+
+## Why This Project Stands Out
+
+- Combines computer vision, Generative AI, and full-stack development
+- Solves a real-world agriculture use case
+- Produces actionable recommendations, not just predictions
+- Tracks user history for better plant health monitoring
+- Ready to be extended into a larger agritech platform
+
+## Author
 
 Sahbaz Siddique
 
-⭐ Support
+## Support
 
-If you like this project:
-
-👉 Give it a ⭐ on GitHub
-👉 Share with others
+If you like this project, consider starring the repository and sharing it with others.
