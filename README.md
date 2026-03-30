@@ -115,6 +115,10 @@ Sign Up
 
 <img width="1905" height="911" alt="Screenshot 2026-03-30 230828" src="https://github.com/user-attachments/assets/aea9cf87-7222-4f5f-b8df-511612e3adb2" />
 
+## :PDF Report Preview
+
+[report.pdf](https://github.com/user-attachments/files/26358925/report.pdf)
+
 ## :hammer_and_wrench: Tech Stack
 
 | Layer | Technologies |
